@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>BATTLE RUSH LIVE — Control</title>
+<link rel="stylesheet" href="/css/control.css" />
+</head>
+<body>
+  <div id="status">Not connected</div>
+
+  <div id="tokenBox">
+    <h2>🎮 BATTLE RUSH LIVE</h2>
+    <p>Enter your CONTROL_TOKEN (set on the server) to unlock this panel.</p>
+    <input id="tokenInput" type="password" placeholder="CONTROL_TOKEN" />
+    <button id="connectBtn">CONNECT</button>
+  </div>
+
+  <div id="panel">
+    <div class="section-title">Round</div>
+    <div class="grid">
+      <button class="action green" data-action="START_ROUND">⏱️<span>START ROUND</span></button>
+      <button class="action danger" data-action="STOP_ROUND">🛑<span>STOP ROUND</span></button>
+      <button class="action dark full" data-action="RESET">🔄<span>RESET</span></button>
+    </div>
+
+    <div class="section-title">Team Attacks</div>
+    <div class="grid">
+      <button class="action red" data-action="RED_ATTACK">🔴<span>RED ATTACK</span></button>
+      <button class="action blue" data-action="BLUE_ATTACK">🔵<span>BLUE ATTACK</span></button>
+      <button class="action purple full" data-action="MEGA_ATTACK">⚔️<span>MEGA ATTACK</span></button>
+    </div>
+
+    <div class="section-title">Special Events</div>
+    <div class="grid">
+      <button class="action green" data-action="HEAL">❤️<span>HEAL</span></button>
+      <button class="action gold" data-action="FIRE_STORM">🔥<span>FIRE STORM</span></button>
+      <button class="action purple" data-action="METEOR">☄️<span>METEOR</span></button>
+      <button class="action dark" data-action="SPAWN_BOSS">👹<span>SPAWN BOSS</span></button>
+      <button class="action gold" data-action="LIGHTNING">⚡<span>LIGHTNING</span></button>
+      <button class="action green" data-action="BONUS">💰<span>BONUS</span></button>
+    </div>
+
+    <div id="demoRow">
+      <div>
+        <div style="font-weight:bold;">DEMO MODE</div>
+        <div style="opacity:0.6; font-size:13px;">Simulates viewers, likes, follows and gifts automatically</div>
+      </div>
+      <div class="switch" id="demoSwitch"><div class="knob"></div></div>
+    </div>
+  </div>
+
+  <script src="/js/control.js"></script>
+</body>
+</html>
