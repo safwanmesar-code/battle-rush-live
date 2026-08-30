@@ -195,6 +195,47 @@ function handleTikTokEvent(evt) {
   }
 }
 
+/** Connects to a REAL TikTok LIVE stream by username (no login/API key needed
+ * for public streams). Requires the streamer to be currently LIVE. */
+class RealTikTokProvider extends TikTokEventProvider {
+  constructor(onEvent, username) {
+    super(onEvent);
+    this.username = username;
+    this.connection = null;
+  }
+  start() {
+    const { TikTokLiveConnection } = require('tiktok-live-connector');
+    this.connection = new TikTokLiveConnection(this.username);
+
+    this.connection.on('like', (d) => this.onEvent({ type: 'LIKE', senderName: d.uniqueId }));
+    this.connection.on('follow', (d) => this.onEvent({ type: 'FOLLOW', senderName: d.uniqueId }));
+    this.connection.on('share', (d) => this.onEvent({ type: 'SHARE', senderName: d.uniqueId }));
+    this.connection.on('member', (d) => this.onEvent({ type: 'JOIN', senderName: d.uniqueId }));
+    this.connection.on('chat', (d) => this.onEvent({ type: 'COMMENT', senderName: d.uniqueId, comment: d.comment }));
+    this.connection.on('gift', (d) => {
+      // tiktok-live-connector sends a stream of gift frames; only count the
+      // final one for streakable gifts to avoid spamming events.
+      if (d.giftType === 1 && !d.repeatEnd) return;
+      this.onEvent({
+        type: 'GIFT',
+        senderName: d.uniqueId,
+        giftName: d.giftName,
+        giftValue: (d.diamondCount || 1) * (d.repeatCount || 1),
+      });
+    });
+
+    this.connection.connect()
+      .then((state) => console.log('Connected to real TikTok LIVE:', this.username, state.roomId))
+      .catch((err) => console.error('TikTok LIVE connection failed:', err.message));
+
+    this.connection.on('disconnected', () => console.log('TikTok LIVE disconnected, will retry...'));
+  }
+  stop() {
+    if (this.connection) this.connection.disconnect();
+    this.connection = null;
+  }
+}
+
 let currentProvider = null;
 function setDemoMode(enabled) {
   if (enabled) {
@@ -221,4 +262,11 @@ server.listen(PORT, () => {
   console.log(`BATTLE RUSH LIVE server running on port ${PORT}`);
   console.log(`Game:    /game`);
   console.log(`Control: /control  (needs ?token=${CONTROL_TOKEN})`);
+
+  const tiktokUsername = process.env.TIKTOK_USERNAME;
+  if (tiktokUsername) {
+    console.log(`Connecting to real TikTok LIVE for @${tiktokUsername} ...`);
+    currentProvider = new RealTikTokProvider(handleTikTokEvent, tiktokUsername);
+    currentProvider.start();
+  }
 });
